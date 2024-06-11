@@ -8,6 +8,7 @@ import org.springframework.stereotype.Component;
 
 //@Component
 // -> 스프링 부트가 제공하는 기본 오류 메커니즘을 사용하기 위해 Component 주석 처리
+//RuntimeException이 WAS에 전달되거나, response.sendError -> 예외 page 경로 호출
 public class WebServletCustomizer implements WebServerFactoryCustomizer<ConfigurableWebServerFactory> {
 
     @Override

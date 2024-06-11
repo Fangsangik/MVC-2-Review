@@ -1,10 +1,17 @@
 package hello.exception.servlet;
 
+import jakarta.servlet.RequestDispatcher;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
+
+import java.util.HashMap;
+import java.util.Map;
 
 @Slf4j
 @Controller
@@ -31,6 +38,27 @@ public class ErrorPageController {
         printErrorInfo(request);
         return "error-page/500";
     }
+
+    @RequestMapping(value = "/error-page/500", produces = MediaType.APPLICATION_JSON_VALUE)
+    //accept type에 따라 뭐가 호출 될꺼야
+
+    public ResponseEntity<Map<String, Object>> errorPage500Api
+            (HttpServletRequest request, HttpServletResponse response) {
+        log.info("API errorPage 500");
+
+        //Jackson 라이브러리는 Map을 Json 구조로 변환 가능
+        Map<String, Object> rst = new HashMap<>();
+        Exception ex = (Exception) request.getAttribute(ERROR_EXCEPTION);
+        rst.put("status", request.getAttribute(ERROR_STATUS_CODE));
+        rst.put("message", ex.getMessage());
+        //순서 중요하지는 않음
+
+        //HTTP 상태 코드
+        Integer statusCode = (Integer) request.getAttribute(RequestDispatcher.ERROR_STATUS_CODE);
+        return new ResponseEntity<>(rst, HttpStatus.valueOf(statusCode));
+    }
+
+    //Accept를 따로 설정 하지 않으면 applicationJson 설정 하지 않은 것이 호출
 
     public void printErrorInfo(HttpServletRequest request) {
         log.info("ERROR_EXCEPTION {}", request.getAttribute(ERROR_EXCEPTION));
